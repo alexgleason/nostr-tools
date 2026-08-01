@@ -7,7 +7,12 @@ import { utf8Encoder } from './utils.ts'
 
 class JS implements Nostr {
   generateSecretKey(): Uint8Array {
-    return schnorr.utils.randomSecretKey()
+    const Fn = schnorr.Point.Fn
+    let secretKey: Uint8Array
+    do {
+      secretKey = crypto.getRandomValues(new Uint8Array(32))
+    } while (!Fn.isValidNot0(Fn.fromBytes(secretKey)))
+    return secretKey
   }
   getPublicKey(secretKey: Uint8Array): string {
     return bytesToHex(schnorr.getPublicKey(secretKey))
